@@ -1,0 +1,37 @@
+{% load static %}
+{% load humanize %}
+
+<!DOCTYPE html>
+<html>
+
+<head>
+  <title>伊藤ハム設備管理</title>
+  <link rel="stylesheet" type="text/css" href="{% static 'css/style.css' %}">
+</head>
+
+<body>
+  <header>
+    <div class="container">
+      <h1><a href="{% url 'app:index' %}">伊藤ハム設備管理</a></h1>
+      <div class="header-menu">
+        {% if request.user.is_authenticated %}
+          <span>Point: {{ user.point|intcomma }}</span>
+          <span><a href="{% url 'app:fav_products' %}">担当設備</a></span>
+          <span><a href="{% url 'app:cart' %}">測定データ</a></span>
+          <span><a href="{% url 'app:order_history' %}">報告履歴</a></span>
+          <span></span><a href="{% url 'app:logout' %}">ログアウト</a></span>
+        {% else %}
+          <span><a href="{% url 'app:login' %}">ログイン</a></span>
+          <span><a href="{% url 'app:signup' %}">新規登録</a></span>
+        {% endif %}
+      </div>
+    </div>
+  </header>
+  <div class="container">
+    {% for message in messages %}
+      <p class="message-{{ message.tags }}">{{ message }}</p>
+    {% endfor %}
+    {% block content %}{% endblock %}
+  </div>
+</body>
+</html>

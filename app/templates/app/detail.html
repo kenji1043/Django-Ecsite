@@ -1,0 +1,51 @@
+{% extends 'app/base.html' %}
+{% load humanize %}
+
+{% block content %}
+
+<div class="product-detail">
+    <div class="product-detail-image">
+        <img src="{{ product.image.url }}" class="product-img">
+    </div>
+
+    <div class="product-detail-info">
+        <h2>{{ product.name }}</h2>
+        <hr>
+        <div class="point-fav-section">
+            <h4>{{ product.price|intcomma }}年度導入</h4>
+
+            {% if request.user.is_authenticated %}
+                <form action="{% url 'app:toggle_fav_product_status' %}"
+                    method="post">{% csrf_token %}
+                    <!--hidden 非表示データの送信-->
+                    <input type="hidden" name="product_id" value="{{ product.id }}">
+                    {% if product in user.fav_products.all %}
+                        <input type="submit" name="submit" class="fav_button" value="担当から外す" />
+                    {% else %}
+                        <input type="submit" name="submit" class="fav_button" value="担当に入れる" />
+                     {% endif %}
+                </form>
+            {% endif %}
+        </div>
+        <p>{{ product.description }}</p>
+
+        <div>
+            {% if request.user.is_authenticated %}
+                <form action="{% url 'app:detail' product.id %}"
+                    method="post">{% csrf_token %}
+                    <!--views/def detail add_to_cart_form = AddToCartForm-->
+                    {{ add_to_cart_form.as_p }}
+                    <button class="purchase-button" type="submit">点検完了</button>
+                </form>
+            {% else %}
+                <a href="{% url 'app:login' %}?next={{ request.path }}">
+                <button class="purchase-button">ログインして測定データ登録する</button></a>
+            {% endif %}
+        </div>
+        
+    </div>
+
+</div>
+{% endblock %}
+
+

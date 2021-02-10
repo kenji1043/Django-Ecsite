@@ -1,0 +1,57 @@
+{% extends 'app/base.html' %}
+{% load humanize %}
+{% load filters %} <!--filtersファイルをロードする-->
+
+{% block content %}
+
+<div class="cart">
+
+<h2>未報告測定データ一覧</h2>
+    <div class="purchase-form">
+        <form action="{% url 'app:cart' %}" method="post">{% csrf_token %}
+            <div class="purchase-form-container">
+                <div class="purchase-form-address">
+                    <div>
+                        {{ purchase_form.non_field_errors }}
+                        {{ purchase_form.zip_code.label_tag }}
+                        {{ purchase_form.zip_code }}
+                        <input type="submit" name="search_address" value="住所を検索"/>
+                        <span>{{ purchase_form.zip_code.help_text }}</span>
+                    </div>
+                    <div>
+                        {{ purchase_form.address.label_tag }}
+                        {{ purchase_form.address }}
+                    </div>
+                </div>
+                <div class="purchase-form-pay">
+                    請求額：{{ total_price | intcomma }}
+                    <input type="submit" name="buy_product" class="purchase-button" value="購入する" />
+                </div>
+            </div>
+        </form>
+    </div>
+
+    {% for product, num in cart_products.items %}
+    <div class="order-item">
+        <div class="order-item-image">
+            <a href="{% url 'app:detail' product.id %}">
+            <img src="{{ product.image.url }}" class="product-img">
+            </a>
+        </div>
+        <div class="order-item-info">
+            <h2>{{ product.name }}</h2>
+            <div>導入年：<span class="info-value">{{ product.price|intcomma }}</span></div>
+            <div>測定値：<span class="info-value">{{ num|intcomma }}</span></div>
+            <div>Ｎｏ.(年×値)：<span class="info-value">{% multiply1 product.price num %}</span></div>
+            <div class="order-item-amount-form">
+                <form action="{% url 'app:change_item_amount' %}" method="post">{% csrf_token %}
+                    <input type="hidden" name="product_id" value="{{ product.id }}">
+                    <input type="submit" name="action_remove" value="▽"/>
+                    <input type="submit" name="action_add" value="△"/>
+                </form>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% endblock %}
